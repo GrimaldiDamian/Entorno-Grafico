@@ -22,12 +22,23 @@ class Pantalla():
         self.usuario = ""
         self.password = ""
         self.momento_login = "usuario"
-        self.momento_opcion3 = "anio"
+        self.momentos_opciones = ""
         self.archivo_json = ""
+        
+        # variables utilizadas paras los put, post, delete y una para el get
+        
         self.categorias = ""
         self.anio = ""
         self.categorias_anterior = ""
+        self.share = ""
+        self.id = ""
+        self.firstname = ""
+        self.surname = ""
         self.premio = ""
+        self.motivation = ""
+        self.overallMotivation = ""
+        self.laureate = ""
+        
         self.reemplazo = {
             "[0]": "0", "[1]": "1", "[2]": "2", "[3]": "3", "[4]": "4",
             "[5]": "5", "[6]": "6", "[7]": "7", "[8]": "8", "[9]": "9",

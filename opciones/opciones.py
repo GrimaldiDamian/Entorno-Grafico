@@ -1,5 +1,6 @@
 import pygame
 import requests
+from clase.clases import *
 
 def render_text(surface, text, position, font, color=(255, 255, 255)):
     """
@@ -21,10 +22,10 @@ def manejo_tecla_opcion3(pantalla,teclado,url):
     """
     En esta funcion se utiliza para el manejo la opcion 3, para la carga de los datos
     """
-    if pantalla.momento_opcion3 == "anio":
+    if pantalla.momentos_opciones == "anio":
         pantalla.anio = pantalla.manejo_texto(teclado, pantalla.anio)
         if teclado == pygame.K_RETURN:
-            pantalla.momento_opcion3 = "categoria"
+            pantalla.momentos_opciones = "categoria"
     else:
         pantalla.categorias = pantalla.manejo_texto(teclado, pantalla.categorias)
         if teclado == pygame.K_RETURN:
@@ -39,7 +40,68 @@ def manejo_tecla_opcion3(pantalla,teclado,url):
                 print("Error")
                 pantalla.anio = ""
                 pantalla.categorias = ""
-                pantalla.momento_opcion3 = "anio"
+                pantalla.momentos_opciones = "anio"
+
+def agregarLaureate(pantalla,teclado):
+    lista =[]
+    carga = "id"
+    
+    share = int(pantalla.share)
+    for i in range(share):
+        if carga == "id":
+            pantalla.id =  pantalla.id(teclado, pantalla.anio)
+            if teclado == pygame.K_RETURN:
+                carga = "firstname"
+        elif carga == "firstname":
+            pantalla.firstname = input("Ingrese el nombre del laureado: ")
+            if teclado == pygame.K_RETURN:
+                carga = "surname"
+        elif carga == "surname":
+            pantalla.surname = input("Ingrese el apellido del laureado: ")
+            if teclado == pygame.K_RETURN:
+                carga = "motivation"
+        elif carga == "mativation":
+            pantalla.motivation = input("Ingrese la motivación del laureado: ")
+            if teclado == pygame.K_RETURN:
+                laureates = Laureate(id=pantalla.id, firstname=pantalla.firstname, surname=pantalla.surname, motivation=pantalla.motivation, share=pantalla.share)
+                lista.append(laureates)
+                carga = "id"
+    
+    pantalla.momento_opciones = "overallMotivation"
+    
+    return lista
+
+"""
+self.categorias = ""
+self.anio = ""
+self.categorias_anterior = ""
+self.share = ""
+self.id = ""
+self.firstname = ""
+self.surname = ""
+self.premio = ""
+self.motivation = ""
+self.overallMotivation = ""
+"""
+
+def manejo_tecla_op4 (pantalla,teclado,url):
+    if pantalla.momentos_opciones == "anio":
+        pantalla.anio = pantalla.manejo_texto(teclado, pantalla.anio)
+        if teclado == pygame.K_RETURN:
+            pantalla.momentos_opciones = "categoria"
+    elif pantalla.momentos_opciones:
+        pantalla.categorias = pantalla.manejo_texto(teclado, pantalla.categorias)
+        if teclado == pygame.K_RETURN:
+            pantalla.momento_opciones == "share"
+    elif pantalla.momento_opciones == "share":
+        pantalla.share = pantalla.manejo_texto(teclado, pantalla.share)
+        if teclado == pygame.K_RETURN:
+            pantalla.momento_opciones == "laureates"
+    elif pantalla.momento_opciones == "laureates":
+        pantalla.laureate = agregarLaureate(pantalla,teclado)
+    else:
+        pantalla.overallMotivation = pantalla.manejo_texto(teclado,pantalla.overallMotivation)
+        
 
 def BuscarPremio(pantalla,color):
     """
@@ -105,9 +167,11 @@ def opciones(texto, url, pantalla):
         except requests.RequestException as e:
             print("Error al obtener las categorias:", e)
     elif texto == "3":
+        pantalla.momentos_opciones = "anio"
         pantalla.etapa = "menu 3"
     elif texto == "4":
-        pass
+        pantalla.momentos_opciones = "anio"
+        pantalla.etapa = "menu 4" 
     elif texto == "5":
         pass
     elif texto == "6":
