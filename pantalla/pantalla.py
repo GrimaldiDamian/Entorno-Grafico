@@ -18,11 +18,16 @@ class Pantalla():
         self.myFont = pygame.font.SysFont('Times New Roman', 25)
         self.token = ""
         self.input_texto = ""
+        
+        #login
+        
         self.etapa = "login"
         self.usuario = ""
         self.password = ""
         self.momento_login = "usuario"
+        
         self.momentos_opciones = ""
+        self.momento_carga ="id"
         self.archivo_json = ""
         
         # variables utilizadas paras los put, post, delete y una para el get
@@ -37,7 +42,7 @@ class Pantalla():
         self.premio = ""
         self.motivation = ""
         self.overallMotivation = ""
-        self.laureate = ""
+        self.laureate = []
         
         self.reemplazo = {
             "[0]": "0", "[1]": "1", "[2]": "2", "[3]": "3", "[4]": "4",
@@ -70,6 +75,8 @@ class Pantalla():
             manejo_tecla_menu(self, key, url)
         elif self.etapa == "menu 3":
             manejo_tecla_opcion3(self,key, url)
+        elif self.etapa == "menu 4":
+            manejo_tecla_op4(self,key,url)
         else:
             manejo_teclado_opciones(self,key)
 
@@ -98,3 +105,7 @@ class Pantalla():
             self.fondo_imagen(3)
             self.screen.blit(self.fondo, (0, 0))
             BuscarPremio(self,self.color)
+        elif self.etapa == "menu 4":
+            self.fondo_imagen(3)
+            self.screen.blit(self.fondo, (0, 0))
+            opcion4(self,self.color)
