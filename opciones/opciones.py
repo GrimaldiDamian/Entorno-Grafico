@@ -16,7 +16,7 @@ def opcion3 (screen,color):
     render_text(screen.screen,"Ingrese el anio",(10,10),screen.myFont, color)
     render_text(screen.screen,screen.anio,(10,50),screen.myFont, color)
     render_text(screen.screen,"Ingrese la categoria",(10,90),screen.myFont, color)
-    render_text(screen.screen,screen.categorias,(10,130),screen.myFont, color)
+    render_text(screen.screen,screen.categoria,(10,130),screen.myFont, color)
 
 def manejo_tecla_opcion3(pantalla,teclado,url):
     """
@@ -27,26 +27,26 @@ def manejo_tecla_opcion3(pantalla,teclado,url):
         if teclado == pygame.K_RETURN:
             pantalla.momentos_opciones = "categoria"
     else:
-        pantalla.categorias = pantalla.manejo_texto(teclado, pantalla.categorias)
+        pantalla.categoria = pantalla.manejo_texto(teclado, pantalla.categoria)
         if teclado == pygame.K_RETURN:
             try:
-                respuesta = requests.get(f'{url}/Buscar_Premio',headers={"Authorization": f"Bearer {pantalla.token}"}, params={"year":pantalla.anio,"category":pantalla.categorias})
+                respuesta = requests.get(f'{url}/Buscar_Premio',headers={"Authorization": f"Bearer {pantalla.token}"}, params={"year":pantalla.anio,"category":pantalla.categoria})
                 respuesta.raise_for_status()
                 pantalla.premio = respuesta.json()
                 pantalla.anio = ""
-                pantalla.categorias = ""
+                pantalla.categoria = ""
                 pantalla.etapa = "opcion 3"
             except requests.RequestException as e:
                 print("Error")
                 pantalla.anio = ""
-                pantalla.categorias = ""
+                pantalla.categoria = ""
                 pantalla.momentos_opciones = "anio"
 
 def opcion4(pantalla,color):
     render_text(pantalla.screen,"Ingrese el anio",(10,10),pantalla.myFont, color)
     render_text(pantalla.screen,pantalla.anio,(10,40),pantalla.myFont, color)
     render_text(pantalla.screen,"Ingrese la categoria",(10,70),pantalla.myFont, color)
-    render_text(pantalla.screen,pantalla.categorias,(10,100),pantalla.myFont, color)
+    render_text(pantalla.screen,pantalla.categoria,(10,100),pantalla.myFont, color)
     render_text(pantalla.screen,"Ingrese la cantidad de share",(10,130),pantalla.myFont, color)
     render_text(pantalla.screen,pantalla.share,(10,160),pantalla.myFont, color)
     render_text(pantalla.screen,"Ingrese la id",(10,190),pantalla.myFont, color)
@@ -59,7 +59,8 @@ def opcion4(pantalla,color):
     render_text(pantalla.screen,pantalla.motivation,(10,390),pantalla.myFont, color)
     render_text(pantalla.screen,"Si posee alguna otra motivacion ingreselo, sino presione enter",(10,420),pantalla.myFont, color)
     render_text(pantalla.screen,pantalla.overallMotivation,(10,450),pantalla.myFont, color)
-    # print(pantalla.overallMotivation)
+    if type(pantalla.respuesta) is dict:
+        render_text(pantalla.screen,pantalla.respuesta["mensaje"],(pantalla.ancho/2 - 200,480),pantalla.myFont,color)
 
 def agregarLaureate(pantalla,teclado):
     
@@ -78,27 +79,14 @@ def agregarLaureate(pantalla,teclado):
     elif pantalla.momento_carga == "motivation":
         pantalla.motivation = pantalla.manejo_texto(teclado, pantalla.motivation)
         if teclado == pygame.K_RETURN:
-            laureates = Laureate(id=pantalla.id, firstname=pantalla.firstname, surname=pantalla.surname, motivation=pantalla.motivation, share=pantalla.share)
+            laureates = Laureate(id=int(pantalla.id), firstname=pantalla.firstname, surname=pantalla.surname, motivation=pantalla.motivation, share=int(pantalla.share))
             pantalla.laureate.append(laureates)
-            pantalla.id, pantalla.firstname, pantalla.surname, pantalla.motivation = "", "", "", ""
-            pantalla.momento_carga = "id"
             if len(pantalla.laureate) == int(pantalla.share):
                 pantalla.momentos_opciones = "overallMotivation"
+            pantalla.id, pantalla.firstname, pantalla.surname, pantalla.motivation = "", "", "", ""
+            pantalla.momento_carga = "id"
 
     return pantalla.laureate
-
-"""
-self.categorias = ""
-self.anio = ""
-self.categorias_anterior = ""
-self.share = ""
-self.id = ""
-self.firstname = ""
-self.surname = ""
-self.premio = ""
-self.motivation = ""
-self.overallMotivation = ""
-"""
 
 def manejo_tecla_op4 (pantalla,teclado,url):
     if pantalla.momentos_opciones == "anio":
@@ -106,7 +94,7 @@ def manejo_tecla_op4 (pantalla,teclado,url):
         if teclado == pygame.K_RETURN:
             pantalla.momentos_opciones = "categoria"
     elif pantalla.momentos_opciones == "categoria":
-        pantalla.categorias = pantalla.manejo_texto(teclado, pantalla.categorias)
+        pantalla.categoria = pantalla.manejo_texto(teclado, pantalla.categoria)
         if teclado == pygame.K_RETURN:
             pantalla.momentos_opciones = "share"
     elif pantalla.momentos_opciones == "share":
@@ -117,6 +105,17 @@ def manejo_tecla_op4 (pantalla,teclado,url):
         pantalla.laureate = agregarLaureate(pantalla,teclado)
     else:
         pantalla.overallMotivation = pantalla.manejo_texto(teclado,pantalla.overallMotivation)
+        if teclado == pygame.K_RETURN:
+            pantalla.overallMotivation = pantalla.overallMotivation if pantalla.overallMotivation != "none" else None
+            try:
+                premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
+                pantalla.premio = premio.convertirDict()
+                respuesta = requests.post(f"{url}/Agregar_Premio",headers=pantalla.token, json = pantalla.premio)
+                respuesta.raise_for_status()
+                pantalla.respuesta = respuesta.json()
+                pantalla.etapa = "opcion 4"
+            except requests.RequestException as e:
+                print ("Error en la opcion 4")
 
 def BuscarPremio(pantalla,color):
     """
@@ -133,7 +132,7 @@ def VerCategorias(pantalla,color: tuple[int,int,int]):
     Se espera recibir como parametros, el objeto que se encarga de manejar la pantalla, y un color, RGB.
     """
     y_offset = 10
-    for categorias in pantalla.categorias:
+    for categorias in pantalla.categoria:
         render_text(pantalla.screen, categorias, (10, y_offset), pantalla.myFont,color)
         y_offset += 40  # Incrementar el offset para la siguiente línea de texto
 
@@ -156,7 +155,16 @@ def manejo_teclado_opciones(pantalla, teclado):
     """
     if teclado == pygame.K_BACKSPACE:
         pantalla.anio = ""
-        pantalla.categorias = ""
+        pantalla.categoria = ""
+        pantalla.respuesta = ""
+        pantalla.id = ""
+        pantalla.laureate = []
+        pantalla.firstname = ""
+        pantalla.motivation = ""
+        pantalla.overallMotivation = ""
+        pantalla.share = ""
+        pantalla.surname = ""
+        
         pantalla.etapa = "menu"
 
 def opciones(texto, url, pantalla):
@@ -165,7 +173,7 @@ def opciones(texto, url, pantalla):
     """
     if texto == "1":
         try:
-            respuesta = requests.get(f'{url}/Leer_Archivo', headers={"Authorization": f"Bearer {pantalla.token}"})
+            respuesta = requests.get(f'{url}/Leer_Archivo', headers=pantalla.token)
             respuesta.raise_for_status()
             pantalla.archivo_json = respuesta.json()
             pantalla.etapa = "opcion 1"
@@ -174,11 +182,11 @@ def opciones(texto, url, pantalla):
             print("Error al obtener el archivo:", e)
     elif texto == "2":
         try:
-            respuesta  = requests.get(f'{url}/Categorias',headers={"Authorization": f"Bearer {pantalla.token}"})
+            respuesta  = requests.get(f'{url}/Categorias',headers=pantalla.token)
             respuesta.raise_for_status()
-            pantalla.categorias = respuesta.json()
+            pantalla.categoria = respuesta.json()
             pantalla.etapa = "opcion 2"
-            print(pantalla.categorias)
+            print(pantalla.categoria)
         except requests.RequestException as e:
             print("Error al obtener las categorias:", e)
     elif texto == "3":

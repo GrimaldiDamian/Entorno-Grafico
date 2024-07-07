@@ -32,7 +32,7 @@ class Pantalla():
         
         # variables utilizadas paras los put, post, delete y una para el get
         
-        self.categorias = ""
+        self.categoria = ""
         self.anio = ""
         self.categorias_anterior = ""
         self.share = ""
@@ -43,6 +43,8 @@ class Pantalla():
         self.motivation = ""
         self.overallMotivation = ""
         self.laureate = []
+        
+        self.respuesta = ""
         
         self.reemplazo = {
             "[0]": "0", "[1]": "1", "[2]": "2", "[3]": "3", "[4]": "4",
@@ -89,23 +91,16 @@ class Pantalla():
             self.fondo_imagen(2)
             self.screen.blit(self.fondo, (0, 0))
             menu(self, self.color)
-        elif self.etapa == "opcion 1":
+        elif self.etapa in ["opcion 1", "opcion 2", "opcion 3", "opcion 4", "menu 3", "menu 4"]:
             self.fondo_imagen(3)
             self.screen.blit(self.fondo, (0, 0))
-            verArchivo(self, self.color)
-        elif self.etapa == "opcion 2":
-            self.fondo_imagen(3)
-            self.screen.blit(self.fondo, (0, 0))
-            VerCategorias(self,self.color)
-        elif self.etapa == "menu 3":
-            self.fondo_imagen(3)
-            self.screen.blit(self.fondo, (0, 0))
-            opcion3(self,self.color)
-        elif self.etapa == "opcion 3":
-            self.fondo_imagen(3)
-            self.screen.blit(self.fondo, (0, 0))
-            BuscarPremio(self,self.color)
-        elif self.etapa == "menu 4":
-            self.fondo_imagen(3)
-            self.screen.blit(self.fondo, (0, 0))
-            opcion4(self,self.color)
+            if self.etapa == "opcion 1":
+                verArchivo(self, self.color)
+            if self.etapa == "opcion 2":
+                VerCategorias(self,self.color)
+            if self.etapa == "menu 3":
+                opcion3(self,self.color)
+            if self.etapa == "opcion 3":
+                BuscarPremio(self,self.color)
+            if self.etapa == "menu 4" or self.etapa == "opcion 4":
+                opcion4(self,self.color)

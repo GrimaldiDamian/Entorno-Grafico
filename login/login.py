@@ -12,7 +12,7 @@ def manejo_tecla_login(pantalla,teclado,url):
             try:
                 respuesta = requests.post(f"{url}/token", data={"username": pantalla.usuario, "password": pantalla.password})
                 respuesta.raise_for_status()
-                pantalla.token = respuesta.json()["access_token"]
+                pantalla.token = {"Authorization": f"Bearer {respuesta.json()["access_token"]}"}
                 pantalla.momento_login = "usuario"
                 pantalla.usuario = ""
                 pantalla.password = ""
