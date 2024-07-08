@@ -77,7 +77,7 @@ class Pantalla():
             manejo_tecla_menu(self, key, url)
         elif self.etapa == "menu 3":
             manejo_tecla_opcion3(self,key, url)
-        elif self.etapa == "menu 4":
+        elif self.etapa in ["menu 4", "menu 5"]:
             manejo_tecla_op4(self,key,url)
         else:
             manejo_teclado_opciones(self,key)
@@ -91,7 +91,7 @@ class Pantalla():
             self.fondo_imagen(2)
             self.screen.blit(self.fondo, (0, 0))
             menu(self, self.color)
-        elif self.etapa in ["opcion 1", "opcion 2", "opcion 3", "opcion 4", "menu 3", "menu 4"]:
+        elif self.etapa in ["opcion 1", "opcion 2", "opcion 3", "opcion 4","opcion 5", "menu 3", "menu 4", "menu 5"]:
             self.fondo_imagen(3)
             self.screen.blit(self.fondo, (0, 0))
             if self.etapa == "opcion 1":
@@ -102,5 +102,5 @@ class Pantalla():
                 opcion3(self,self.color)
             if self.etapa == "opcion 3":
                 BuscarPremio(self,self.color)
-            if self.etapa == "menu 4" or self.etapa == "opcion 4":
+            if self.etapa in ["menu 4", "opcion 4", "menu 5", "opcion 5"]:
                 opcion4(self,self.color)

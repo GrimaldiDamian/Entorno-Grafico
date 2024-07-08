@@ -43,6 +43,9 @@ def manejo_tecla_opcion3(pantalla,teclado,url):
                 pantalla.momentos_opciones = "anio"
 
 def opcion4(pantalla,color):
+    """
+    Se encarga de mostrar tanto el resultado, como el texto en pantalla.
+    """
     render_text(pantalla.screen,"Ingrese el anio",(10,10),pantalla.myFont, color)
     render_text(pantalla.screen,pantalla.anio,(10,40),pantalla.myFont, color)
     render_text(pantalla.screen,"Ingrese la categoria",(10,70),pantalla.myFont, color)
@@ -57,13 +60,18 @@ def opcion4(pantalla,color):
     render_text(pantalla.screen,pantalla.surname,(10,330),pantalla.myFont, color)
     render_text(pantalla.screen,"Ingrese su motivacion",(10,360),pantalla.myFont, color)
     render_text(pantalla.screen,pantalla.motivation,(10,390),pantalla.myFont, color)
-    render_text(pantalla.screen,"Si posee alguna otra motivacion ingreselo, sino presione enter",(10,420),pantalla.myFont, color)
-    render_text(pantalla.screen,pantalla.overallMotivation,(10,450),pantalla.myFont, color)
-    if type(pantalla.respuesta) is dict:
-        render_text(pantalla.screen,pantalla.respuesta["mensaje"],(pantalla.ancho/2 - 200,480),pantalla.myFont,color)
+    
+    if pantalla.etapa in ["menu 4", "opcion 4"]:
+        render_text(pantalla.screen,"Si posee alguna otra motivacion ingreselo, sino presione enter",(10,420),pantalla.myFont, color)
+        render_text(pantalla.screen,pantalla.overallMotivation,(10,450),pantalla.myFont, color)
+    if isinstance(pantalla.respuesta, dict):
+        render_text(pantalla.screen,pantalla.respuesta["mensaje"],(pantalla.ancho/2 - 100,480),pantalla.myFont,color)
+    else:
+        render_text(pantalla.screen,pantalla.respuesta,(10,480),pantalla.myFont,color)
 
 def agregarLaureate(pantalla,teclado):
-    
+    """
+    """
     if pantalla.momento_carga == "id":
         pantalla.id = pantalla.manejo_texto(teclado, pantalla.id)
         if teclado == pygame.K_RETURN:
@@ -82,7 +90,7 @@ def agregarLaureate(pantalla,teclado):
             laureates = Laureate(id=int(pantalla.id), firstname=pantalla.firstname, surname=pantalla.surname, motivation=pantalla.motivation, share=int(pantalla.share))
             pantalla.laureate.append(laureates)
             if len(pantalla.laureate) == int(pantalla.share):
-                pantalla.momentos_opciones = "overallMotivation"
+                pantalla.momentos_opciones = "overallMotivation" if pantalla.etapa == "menu 4" else "opcion_5"
             pantalla.id, pantalla.firstname, pantalla.surname, pantalla.motivation = "", "", "", ""
             pantalla.momento_carga = "id"
 
@@ -103,7 +111,7 @@ def manejo_tecla_op4 (pantalla,teclado,url):
             pantalla.momentos_opciones = "laureates"
     elif pantalla.momentos_opciones == "laureates":
         pantalla.laureate = agregarLaureate(pantalla,teclado)
-    else:
+    elif pantalla.momentos_opciones == "overallMotivation":
         pantalla.overallMotivation = pantalla.manejo_texto(teclado,pantalla.overallMotivation)
         if teclado == pygame.K_RETURN:
             pantalla.overallMotivation = pantalla.overallMotivation if pantalla.overallMotivation != "none" else None
@@ -115,26 +123,36 @@ def manejo_tecla_op4 (pantalla,teclado,url):
                 pantalla.respuesta = respuesta.json()
                 pantalla.etapa = "opcion 4"
             except requests.RequestException as e:
+                resetear_variables(pantalla)
+                pantalla.momentos_opciones = "anio"
                 print ("Error en la opcion 4")
+    elif pantalla.momentos_opciones == "opcion_5":
+        try:
+            premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
+            pantalla.premio = premio.convertirDict()
+            respuesta = requests.put(f"{url}/Actualizar_Laureate",headers=pantalla.token, json = pantalla.premio)
+            respuesta.raise_for_status()
+            pantalla.respuesta = respuesta.json()
+            pantalla.etapa = "opcion 5"
+        except requests.RequestException as e:
+            resetear_variables(pantalla)
+            pantalla.momentos_opciones = "anio"
+            print ("Error en la opcion 5")
 
-def BuscarPremio(pantalla,color):
+def resetear_variables(pantalla):
     """
-    Se encarga de mostrar el resultado correctos de la opcion 3.
+    Se encarga de limpiar todas las variables que son utilizadas, para la hora de volver a entrar a una opcion, siempre esten limpias.
     """
-    y_inicial = 10
-    for text in pantalla.premio:
-        render_text(pantalla.screen, text, (20, y_inicial), pantalla.myFont,color)
-        y_inicial += 30
-
-def VerCategorias(pantalla,color: tuple[int,int,int]):
-    """
-    Se encarga de mostrar la opcion 2.
-    Se espera recibir como parametros, el objeto que se encarga de manejar la pantalla, y un color, RGB.
-    """
-    y_offset = 10
-    for categorias in pantalla.categoria:
-        render_text(pantalla.screen, categorias, (10, y_offset), pantalla.myFont,color)
-        y_offset += 40  # Incrementar el offset para la siguiente línea de texto
+    pantalla.anio = ""
+    pantalla.categoria = ""
+    pantalla.respuesta = ""
+    pantalla.id = ""
+    pantalla.laureate = []
+    pantalla.firstname = ""
+    pantalla.motivation = ""
+    pantalla.overallMotivation = ""
+    pantalla.share = ""
+    pantalla.surname = ""
 
 def verArchivo(pantalla, color):
     """
@@ -147,24 +165,31 @@ def verArchivo(pantalla, color):
             render_text(pantalla.screen, text, (20, y_offset), pantalla.myFont,color)
             y_offset += 40  # Incrementar el offset para la siguiente línea de texto
 
-    pygame.display.flip()
+def VerCategorias(pantalla,color: tuple[int,int,int]):
+    """
+    Se encarga de mostrar la opcion 2.
+    Se espera recibir como parametros, el objeto que se encarga de manejar la pantalla, y un color, RGB.
+    """
+    y_offset = 10
+    for categorias in pantalla.categoria:
+        render_text(pantalla.screen, categorias, (10, y_offset), pantalla.myFont,color)
+        y_offset += 40  # Incrementar el offset para la siguiente línea de texto
+
+def BuscarPremio(pantalla,color):
+    """
+    Se encarga de mostrar el resultado correctos de la opcion 3.
+    """
+    y_inicial = 10
+    for text in pantalla.premio:
+        render_text(pantalla.screen, text, (20, y_inicial), pantalla.myFont,color)
+        y_inicial += 30
 
 def manejo_teclado_opciones(pantalla, teclado):
     """
     Esta funcion se encargar de volver al menu
     """
     if teclado == pygame.K_BACKSPACE:
-        pantalla.anio = ""
-        pantalla.categoria = ""
-        pantalla.respuesta = ""
-        pantalla.id = ""
-        pantalla.laureate = []
-        pantalla.firstname = ""
-        pantalla.motivation = ""
-        pantalla.overallMotivation = ""
-        pantalla.share = ""
-        pantalla.surname = ""
-        
+        resetear_variables(pantalla)
         pantalla.etapa = "menu"
 
 def opciones(texto, url, pantalla):
@@ -196,8 +221,9 @@ def opciones(texto, url, pantalla):
         pantalla.momentos_opciones = "anio"
         pantalla.etapa = "menu 4" 
     elif texto == "5":
-        pass
+        pantalla.momentos_opciones = "anio"
+        pantalla.etapa = "menu 5"
     elif texto == "6":
-        pass
+        pantalla.etapa = "menu 6"
     elif texto == "7":
-        pass
+        pantalla.etapa = "menu 7"
