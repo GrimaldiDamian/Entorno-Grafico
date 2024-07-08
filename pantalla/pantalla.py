@@ -3,7 +3,7 @@ import requests
 import sys
 from login.login import *
 from menu.menu import *
-from opciones.opciones import *
+from opciones import *
 
 url = "http://localhost:8000"
 
@@ -76,9 +76,9 @@ class Pantalla():
         elif self.etapa == "menu":
             manejo_tecla_menu(self, key, url)
         elif self.etapa == "menu 3":
-            manejo_tecla_opcion3(self,key, url)
+            op3.manejo_tecla_opcion3(self,key, url)
         elif self.etapa in ["menu 4", "menu 5"]:
-            manejo_tecla_op4(self,key,url)
+            op4_y_5.manejo_tecla_op4(self,key,url)
         else:
             manejo_teclado_opciones(self,key)
 
@@ -95,12 +95,12 @@ class Pantalla():
             self.fondo_imagen(3)
             self.screen.blit(self.fondo, (0, 0))
             if self.etapa == "opcion 1":
-                verArchivo(self, self.color)
+                op1.verArchivo(self, self.color)
             if self.etapa == "opcion 2":
-                VerCategorias(self,self.color)
+                op2.VerCategorias(self,self.color)
             if self.etapa == "menu 3":
-                opcion3(self,self.color)
+                op3.opcion3(self,self.color)
             if self.etapa == "opcion 3":
-                BuscarPremio(self,self.color)
+                op3.BuscarPremio(self,self.color)
             if self.etapa in ["menu 4", "opcion 4", "menu 5", "opcion 5"]:
-                opcion4(self,self.color)
+                op4_y_5.opcion4(self,self.color)

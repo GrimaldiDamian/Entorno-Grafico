@@ -1,5 +1,5 @@
 import pygame
-from opciones.opciones import *
+from opciones.menuOpciones import *
 
 def manejo_tecla_menu(pantalla, teclado, url):
     """
