@@ -1,13 +1,14 @@
 import pygame
 import requests
 from clase.clases import *
+from opciones.resetear_variables import *
 
 def manejo_teclado_opciones(pantalla, teclado):
     """
     Esta funcion se encargar de volver al menu
     """
     if teclado == pygame.K_BACKSPACE:
-        opciones.resetear_variables(pantalla)
+        resetear_variables(pantalla)
         pantalla.etapa = "menu"
 
 def opciones(texto, url, pantalla):
