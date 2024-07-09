@@ -3,7 +3,7 @@ import requests
 import sys
 from login.login import *
 from menu.menu import *
-from opciones import *
+from opciones import op1, op2, op3,op4_y_5, op6
 
 url = "http://localhost:8000"
 

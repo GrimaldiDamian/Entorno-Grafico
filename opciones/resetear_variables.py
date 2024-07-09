@@ -4,7 +4,7 @@ def resetear_variables(pantalla):
     """
     pantalla.anio = ""
     pantalla.categoria = ""
-    pantalla.categoria_anterio = ""
+    pantalla.categorias_anterior = ""
     pantalla.respuesta = ""
     pantalla.id = ""
     pantalla.laureate = []
