@@ -4,6 +4,7 @@ def resetear_variables(pantalla):
     """
     pantalla.anio = ""
     pantalla.categoria = ""
+    pantalla.categoria_anterio = ""
     pantalla.respuesta = ""
     pantalla.id = ""
     pantalla.laureate = []
@@ -12,3 +13,4 @@ def resetear_variables(pantalla):
     pantalla.overallMotivation = ""
     pantalla.share = ""
     pantalla.surname = ""
+    pantalla.momentos_opciones = "anio"

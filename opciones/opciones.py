@@ -34,13 +34,10 @@ def opciones(texto, url, pantalla):
         except requests.RequestException as e:
             print("Error al obtener las categorias:", e)
     elif texto == "3":
-        pantalla.momentos_opciones = "anio"
         pantalla.etapa = "menu 3"
     elif texto == "4":
-        pantalla.momentos_opciones = "anio"
         pantalla.etapa = "menu 4" 
     elif texto == "5":
-        pantalla.momentos_opciones = "anio"
         pantalla.etapa = "menu 5"
     elif texto == "6":
         pantalla.etapa = "menu 6"

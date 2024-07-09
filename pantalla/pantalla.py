@@ -26,7 +26,7 @@ class Pantalla():
         self.password = ""
         self.momento_login = "usuario"
         
-        self.momentos_opciones = ""
+        self.momentos_opciones = "anio"
         self.momento_carga ="id"
         self.archivo_json = ""
         
@@ -77,8 +77,10 @@ class Pantalla():
             manejo_tecla_menu(self, key, url)
         elif self.etapa == "menu 3":
             op3.manejo_tecla_opcion3(self,key, url)
-        elif self.etapa in ["menu 4", "menu 5"]:
+        elif self.etapa in ["menu 4", "menu 5", "menu 7"]:
             op4_y_5.manejo_tecla_op4(self,key,url)
+        elif self.etapa == "menu 6":
+            op6.manejo_teclado_op6(self,key,url)
         else:
             manejo_teclado_opciones(self,key)
 
@@ -91,7 +93,7 @@ class Pantalla():
             self.fondo_imagen(2)
             self.screen.blit(self.fondo, (0, 0))
             menu(self, self.color)
-        elif self.etapa in ["opcion 1", "opcion 2", "opcion 3", "opcion 4","opcion 5", "menu 3", "menu 4", "menu 5"]:
+        elif self.etapa in ["opcion 1", "opcion 2", "opcion 3", "opcion 4","opcion 5","opcion 6", "opcion 7", "menu 3", "menu 4", "menu 5", "menu 6", "menu 7"]:
             self.fondo_imagen(3)
             self.screen.blit(self.fondo, (0, 0))
             if self.etapa == "opcion 1":
@@ -102,5 +104,7 @@ class Pantalla():
                 op3.opcion3(self,self.color)
             if self.etapa == "opcion 3":
                 op3.BuscarPremio(self,self.color)
-            if self.etapa in ["menu 4", "opcion 4", "menu 5", "opcion 5"]:
+            if self.etapa in ["menu 4", "opcion 4", "menu 5", "opcion 5","menu 7", "opcion 7"]:
                 op4_y_5.opcion4(self,self.color)
+            if self.etapa in ["menu 6", "opcion 6"]:
+                op6.opcion6(self,self.color)

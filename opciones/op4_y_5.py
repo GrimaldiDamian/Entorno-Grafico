@@ -23,7 +23,7 @@ def opcion4(pantalla,color):
     render_text(pantalla.screen,"Ingrese su motivacion",(10,360),pantalla.myFont, color)
     render_text(pantalla.screen,pantalla.motivation,(10,390),pantalla.myFont, color)
     
-    if pantalla.etapa in ["menu 4", "opcion 4"]:
+    if pantalla.etapa in ["menu 4", "opcion 4", "menu 7", "opcion 7"]:
         render_text(pantalla.screen,"Si posee alguna otra motivacion ingreselo, sino presione enter",(10,420),pantalla.myFont, color)
         render_text(pantalla.screen,pantalla.overallMotivation,(10,450),pantalla.myFont, color)
     if isinstance(pantalla.respuesta, dict):
@@ -53,15 +53,51 @@ def agregarLaureate(pantalla,teclado):
             laureates = Laureate(id=int(pantalla.id), firstname=pantalla.firstname, surname=pantalla.surname, motivation=pantalla.motivation, share=int(pantalla.share))
             pantalla.laureate.append(laureates)
             if len(pantalla.laureate) == int(pantalla.share):
-                pantalla.momentos_opciones = "overallMotivation" if pantalla.etapa == "menu 4" else "opcion_5"
+                pantalla.momentos_opciones = "overallMotivation" if pantalla.etapa in ["menu 4", "menu 7"] else "opcion_5"
             pantalla.id, pantalla.firstname, pantalla.surname, pantalla.motivation = "", "", "", ""
             pantalla.momento_carga = "id"
 
     return pantalla.laureate
 
+def op7(pantalla,url):
+    try:
+        premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
+        pantalla.premio = premio.convertirDict()
+        respuesta = requests.delete(f"{url}/Eliminar_Premio",headers=pantalla.token, json = pantalla.premio)
+        respuesta.raise_for_status()
+        pantalla.respuesta = respuesta.json()
+        pantalla.etapa = "opcion 7"
+    except requests.RequestException as e:
+        resetear_variables(pantalla)
+        print ("Error en la opcion 7")
+
+def op5(pantalla,url):
+    try:
+        premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
+        pantalla.premio = premio.convertirDict()
+        respuesta = requests.put(f"{url}/Actualizar_Laureate",headers=pantalla.token, json = pantalla.premio)
+        respuesta.raise_for_status()
+        pantalla.respuesta = respuesta.json()
+        pantalla.etapa = "opcion 5"
+    except requests.RequestException as e:
+        resetear_variables(pantalla)
+        print ("Error en la opcion 5")
+
+def op4(pantalla,url):
+    try:
+        premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
+        pantalla.premio = premio.convertirDict()
+        respuesta = requests.post(f"{url}/Agregar_Premio",headers=pantalla.token, json = pantalla.premio)
+        respuesta.raise_for_status()
+        pantalla.respuesta = respuesta.json()
+        pantalla.etapa = "opcion 4"
+    except requests.RequestException as e:
+        resetear_variables(pantalla)
+        print ("Error en la opcion 4")
+
 def manejo_tecla_op4 (pantalla,teclado,url):
     """
-    Se encarga de manejar el teclado, para la opcion 4 y 5
+    Se encarga de manejar el teclado, para la opcion 4, 5 y 7
     """
     if pantalla.momentos_opciones == "anio":
         pantalla.anio = pantalla.manejo_texto(teclado, pantalla.anio)
@@ -81,26 +117,9 @@ def manejo_tecla_op4 (pantalla,teclado,url):
         pantalla.overallMotivation = pantalla.manejo_texto(teclado,pantalla.overallMotivation)
         if teclado == pygame.K_RETURN:
             pantalla.overallMotivation = pantalla.overallMotivation if pantalla.overallMotivation != "none" else None
-            try:
-                premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
-                pantalla.premio = premio.convertirDict()
-                respuesta = requests.post(f"{url}/Agregar_Premio",headers=pantalla.token, json = pantalla.premio)
-                respuesta.raise_for_status()
-                pantalla.respuesta = respuesta.json()
-                pantalla.etapa = "opcion 4"
-            except requests.RequestException as e:
-                resetear_variables(pantalla)
-                pantalla.momentos_opciones = "anio"
-                print ("Error en la opcion 4")
+            if pantalla.etapa == "menu 4":
+                op4(pantalla,url)
+            elif pantalla.etapa == "menu 7":
+                op7(pantalla,url)
     elif pantalla.momentos_opciones == "opcion_5":
-        try:
-            premio = Premio(anio = int(pantalla.anio),categoria = pantalla.categoria,laureate = pantalla.laureate,overallMotivation = pantalla.overallMotivation)
-            pantalla.premio = premio.convertirDict()
-            respuesta = requests.put(f"{url}/Actualizar_Laureate",headers=pantalla.token, json = pantalla.premio)
-            respuesta.raise_for_status()
-            pantalla.respuesta = respuesta.json()
-            pantalla.etapa = "opcion 5"
-        except requests.RequestException as e:
-            resetear_variables(pantalla)
-            pantalla.momentos_opciones = "anio"
-            print ("Error en la opcion 5")
+        op5(pantalla,url)
