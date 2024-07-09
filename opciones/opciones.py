@@ -30,7 +30,6 @@ def opciones(texto, url, pantalla):
             respuesta.raise_for_status()
             pantalla.categoria = respuesta.json()
             pantalla.etapa = "opcion 2"
-            print(pantalla.categoria)
         except requests.RequestException as e:
             print("Error al obtener las categorias:", e)
     elif texto == "3":
